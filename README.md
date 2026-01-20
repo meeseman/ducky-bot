@@ -1,73 +1,70 @@
-# Discord Video Link Bot
+# Discord Hello Bot
 
-A simple Discord bot that automatically detects Instagram and TikTok links and forwards them to a dedicated "videos" channel.
-
-## Features
-
-### Video Links
-- 🔍 Automatically detects any links containing "instagram" or "tiktok" in messages
-- 📺 Forwards links to a channel named "videos"
-- 👤 Shows who posted the link and from which channel
-- 🔗 Converts links by adding "kk" prefix (e.g., `instagram.com` → `kkinstagram.com`)
-- 📝 Sends plain text links (no embeds) for easy copying
-- 🗑️ Automatically deletes the original message after forwarding
-
-### Specific User Message Forwarding (ID: 1441164318711222353)
-- 🖼️ Forwards images to a channel named "ducky-images"
-- 💬 Forwards text messages (without links or images) to a channel named "ducky-messages"
-- 🗑️ Automatically deletes the original messages after forwarding
+A simple Discord bot that responds with "Hello" when users type `!hello`.
 
 ## Setup Instructions
 
 ### 1. Create a Discord Bot
 
-1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click "New Application" and give it a name
-3. Go to the "Bot" section and click "Add Bot"
-4. Under "Privileged Gateway Intents", enable:
-   - MESSAGE CONTENT INTENT
-   - SERVER MEMBERS INTENT (optional)
-5. Copy your bot token (you'll need this later)
+3. Go to the "Bot" tab and click "Add Bot"
+4. Under "Privileged Gateway Intents", enable "MESSAGE CONTENT INTENT"
+5. Click "Reset Token" to get your bot token (save this securely!)
 
-### 2. Invite the Bot to Your Server
-
-1. In the Developer Portal, go to "OAuth2" → "URL Generator"
-2. Select scopes:
-   - `bot`
-3. Select bot permissions:
-   - Read Messages/View Channels
-   - Send Messages
-   - Embed Links
-   - Read Message History
-   - Manage Messages (to delete the original messages)
-4. Copy the generated URL and open it in your browser
-5. Select your server and authorize the bot
-
-### 3. Install Dependencies
+### 2. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configure the Bot
+### 3. Configure Bot Token
 
-1. Copy `.env.example` to `.env`:
-   ```bash
-   copy .env.example .env
-   ```
-   (On Linux/Mac, use `cp .env.example .env`)
+Create a `.env` file in the project root:
 
-2. Edit `.env` and paste your bot token:
-   ```
-   DISCORD_TOKEN=your_actual_bot_token_here
-   ```
+```
+DISCORD_BOT_TOKEN=your_actual_bot_token_here
+AI_KEY=your_gemini_api_key_here
+TWITCH_CLIENT_ID=your_twitch_client_id_here
+TWITCH_CLIENT_SECRET=your_twitch_client_secret_here
+YOUTUBE_API_KEY=your_youtube_api_key_here
+```
+
+**Get your API keys:**
+- Gemini API key: [Google AI Studio](https://aistudio.google.com/app/apikey)
+- Twitch API credentials: [Twitch Developer Console](https://dev.twitch.tv/console/apps)
+- YouTube API key: [Google Cloud Console](https://console.cloud.google.com/) → Enable YouTube Data API v3 → Create credentials
+
+Or set it as an environment variable:
+
+**Windows (PowerShell):**
+```powershell
+$env:DISCORD_BOT_TOKEN="your_actual_bot_token_here"
+```
+
+**Windows (CMD):**
+```cmd
+set DISCORD_BOT_TOKEN=your_actual_bot_token_here
+```
+
+**Linux/Mac:**
+```bash
+export DISCORD_BOT_TOKEN=your_actual_bot_token_here
+```
+
+### 4. Invite Bot to Your Server
+
+1. In the Discord Developer Portal, go to "OAuth2" > "URL Generator"
+2. Select scopes: `bot`
+3. Select bot permissions: `Send Messages`, `Read Messages/View Channels`, `Manage Messages` (for deleting video links)
+4. Copy the generated URL and open it in your browser
+5. Select your server and authorize the bot
 
 ### 5. Create Required Channels
 
-Make sure your Discord server has these text channels (exact names, lowercase):
-- **"videos"** - The bot will forward Instagram/TikTok links here
-- **"ducky-images"** - The bot will forward images from the specific user here
-- **"ducky-messages"** - The bot will forward text messages from the specific user here
+Make sure your Discord server has these channels:
+- `#iron-mouse` - For Twitch/YouTube notifications
+- `#videos` - For Instagram/TikTok link forwarding (optional)
 
 ### 6. Run the Bot
 
@@ -75,78 +72,75 @@ Make sure your Discord server has these text channels (exact names, lowercase):
 python bot.py
 ```
 
-You should see a message like:
-```
-YourBotName#1234 has connected to Discord!
-Bot is in 1 guild(s)
-```
-
 ## Usage
 
-Simply send any message containing an Instagram or TikTok link in any channel, and the bot will automatically copy it to the #videos channel and delete the original message!
+Once the bot is running and in your server, you can use these commands:
 
-The bot will send **two messages** to #videos:
-1. First message: An embed showing who sent the link and from which channel
-2. Second message: The **converted link** with "kk" added (see examples below)
+### !hello
+```
+!hello
+```
+The bot will respond with a greeting!
 
-The original message will be **automatically deleted** from the source channel.
+### !ai
+```
+!ai What is the meaning of life?
+!ai Explain quantum physics simply
+!ai Write a haiku about coding
+```
+The bot will use Google's Gemini AI to respond to your message!
 
-### Link Conversion Examples
+### !grigger
+Reply to any message and use this command to fact-check or comment on it:
+```
+[Reply to a message]
+!grigger fact check this
+!grigger explain what this means
+!grigger is this accurate?
+!grigger analyze this claim
+```
+The bot will use AI to analyze the replied message and send a formatted embed with the analysis!
 
-The bot automatically adds "kk" before "instagram" or "tiktok" in the URLs. If there's already a prefix (like vx, dd, etc.), it will be replaced with "kk":
+### !sendreply
+Make the bot reply to any message by its ID:
+```
+!sendreply 1463108816001564806 This is my custom reply!
+!sendreply 1463108816001564806 wah wah wah >:3
+```
+The bot will reply to the specified message. You can get a message ID by right-clicking a message and selecting "Copy Message ID" (requires Developer Mode enabled in Discord settings).
 
-- `https://www.instagram.com/reel/xyz/` → `https://www.kkinstagram.com/reel/xyz/`
-- `https://instagram.com/p/abc/` → `https://kkinstagram.com/p/abc/`
-- `https://www.tiktok.com/@user/video/123` → `https://www.kktiktok.com/@user/video/123`
-- `https://vm.tiktok.com/xyz/` → `https://vm.kktiktok.com/xyz/`
-- `https://www.vxinstagram.com/reel/xyz/` → `https://www.kkinstagram.com/reel/xyz/` (vx replaced with kk)
-- `https://www.ddinstagram.com/p/abc/` → `https://www.kkinstagram.com/p/abc/` (dd replaced with kk)
-- `https://www.kkinstagram.com/...` → `https://www.kkinstagram.com/...` (already has kk, no change)
+### !testtwitch (Testing Command)
+Test if Twitch API is working and see the stream embed:
+```
+!testtwitch
+```
+Shows current stream status or confirms API is working if offline.
 
-This ensures there's always exactly one "kk" prefix for download services!
+### !testyoutube (Testing Command)
+Test if YouTube API is working and see the latest video embed:
+```
+!testyoutube
+```
+Shows the latest video/stream from Ironmouse's channel.
 
-### Specific User Forwarding (ID: 1441164318711222353)
+## Features
 
-The bot monitors all messages from a specific user and forwards them to dedicated channels:
+- **!hello** - Responds with a friendly greeting
+- **!ai** - Chat with Google's Gemini AI
+- **!grigger** - Fact-check or analyze any message by replying to it
+- **!sendreply** - Make the bot reply to any message by ID (useful for remote control)
+- **Random quirky AI responses** - Bot acts as Ironmouse with anime roleplay text (5% chance, max 10/hour)
+- **Twitch stream notifications** - Automatically notifies when Ironmouse goes live (checks every 2 minutes)
+- **YouTube notifications** - Automatically posts when Ironmouse uploads a video or goes live (checks every 5 minutes)
+- **Auto video forwarding** - Detects Instagram/TikTok links, converts them with 'kk' prefix, and forwards to #videos channel
+- Beautiful Discord embeds for fact-checking, stream notifications, and video uploads
+- Rate limiting to prevent spam
+- Mentions the user who sent the command
+- Handles long AI responses by splitting them into multiple messages
+- Simple and easy to extend
 
-#### Images
-When this user posts an image:
-1. The bot sends an embed to #ducky-images showing who sent it and from which channel
-2. The bot sends the image URL
-3. The original message is deleted
+## Requirements
 
-**Supported image formats:** PNG, JPG, JPEG, GIF, WEBP, BMP
-
-#### Text Messages
-When this user posts a text message (no links, no images):
-1. The bot sends an embed to #ducky-messages with the message content, showing who sent it and from which channel
-2. The original message is deleted
-
-**Note:** If the user posts a video link, it will be handled by the video link forwarding feature instead.
-
-**Supported links:**
-- Any link containing "instagram" in the URL (e.g., `https://www.instagram.com/...`, `https://ddinstagram.com/...`)
-- Any link containing "tiktok" in the URL (e.g., `https://www.tiktok.com/...`, `https://vm.tiktok.com/...`, `https://vxtiktok.com/...`)
-
-## Troubleshooting
-
-### Bot doesn't respond to messages
-- Make sure you enabled "MESSAGE CONTENT INTENT" in the Discord Developer Portal
-- Verify the bot has permission to read messages in your channels
-
-### Channel not found warnings
-- Create text channels named "videos", "ducky-images", and "ducky-messages" (all lowercase)
-- Make sure the bot has permission to view and send messages in those channels
-
-### Bot won't start
-- Check that your `.env` file exists and contains a valid token
-- Make sure you installed all dependencies with `pip install -r requirements.txt`
-
-### Bot doesn't delete original messages
-- Make sure the bot has "Manage Messages" permission in your server
-- The bot needs this permission in all channels where you want it to delete messages
-
-## License
-
-Free to use and modify!
+- Python 3.8+
+- discord.py 2.3.2+
 
