@@ -129,7 +129,7 @@ Shows the latest video/stream from Ironmouse's channel.
 - **!ai** - Chat with Google's Gemini AI
 - **!grigger** - Fact-check or analyze any message by replying to it
 - **!sendreply** - Make the bot reply to any message by ID (useful for remote control)
-- **Random quirky AI responses** - Bot acts as Ironmouse with anime roleplay text (5% chance, max 10/hour)
+- **Random quirky AI responses** - Bot acts as Ironmouse with anime roleplay text (0.5% chance, max 10/hour - low to avoid API quota)
 - **Twitch stream notifications** - Automatically notifies when Ironmouse goes live (checks every 2 minutes)
 - **YouTube notifications** - Automatically posts when Ironmouse uploads a video or goes live (checks every 5 minutes)
 - **Auto video forwarding** - Detects Instagram/TikTok links, converts them with 'kk' prefix, and forwards to #videos channel

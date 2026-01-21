@@ -209,14 +209,16 @@ async def get_latest_youtube_video():
     
     return None
 
-@tasks.loop(minutes=5)  # Check every 5 minutes
+@tasks.loop(minutes=3)  # Check every 3 minutes
 async def monitor_ironmouse_youtube():
     """Background task to monitor Ironmouse's YouTube uploads"""
     global last_video_id
     
+    print(f"[YOUTUBE] Checking for new videos...")
     video_data = await get_latest_youtube_video()
     
     if video_data:
+        print(f"[YOUTUBE] Found video: {video_data['title'][:50]}... (ID: {video_data['video_id']})")
         video_id = video_data['video_id']
         
         # If this is a new video (and not our first run)
@@ -269,6 +271,8 @@ async def monitor_ironmouse_youtube():
         
         # Update last seen video ID
         last_video_id = video_id
+    else:
+        print(f"[YOUTUBE] No videos found or API error")
 
 @monitor_ironmouse_youtube.before_loop
 async def before_youtube_monitor():
@@ -292,7 +296,7 @@ async def on_ready():
     if YOUTUBE_API_KEY:
         if not monitor_ironmouse_youtube.is_running():
             monitor_ironmouse_youtube.start()
-        print(f'[YOUTUBE] Monitoring Ironmouse videos (checking every 5 minutes)')
+        print(f'[YOUTUBE] Monitoring Ironmouse videos (checking every 3 minutes)')
     else:
         print('[YOUTUBE] Monitoring disabled - set YOUTUBE_API_KEY to enable')
 
@@ -349,8 +353,9 @@ async def on_message(message):
     # Always process commands first (!hello, !ai)
     await bot.process_commands(message)
     
-    # 1% chance to randomly respond with AI (skip if message was already handled by video forwarding)
-    if genai_client and random.random() < 0.05 and not message_handled:
+    # 0.5% chance to randomly respond with AI (skip if message was already handled by video forwarding)
+    # Very low to avoid hitting Gemini API quota (20 requests/day free tier)
+    if genai_client and random.random() < 0.005 and not message_handled:
         print(f"[RANDOM] Roll succeeded for message in #{message.channel.name}")
         
         # Check rate limit: no more than 10 messages per hour
